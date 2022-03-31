@@ -41,11 +41,12 @@ router.get("/", async (req, res) => {
 });
 router.post("/", async (req, res) => {
   try {
-    const { image_url, caption, location } = req.body;
+    const { image_url, caption, location, user_id } = req.body;
     const newPost = await Post.create({
       image_url,
       caption,
       location,
+      user_id,
     });
     res.status(201).json({
       message: "Post created",
@@ -130,5 +131,72 @@ router.get("/:id/likes", async (req, res) => {
       message: "Server error",
     });
   }
+});
+router.post("/:postId/likes/:userId", async (req, res) => {
+  // 1. check apakah user sudah like post?
+  // 2. tambah relasi user dengan post di table like
+  // 3. increment like count di post
+  const { userId, postId } = req.params;
+  const isUserLikeAlready = await Like.findOne({
+    where: {
+      user_id: userId,
+      post_id: postId,
+    },
+  });
+
+  if (isUserLikeAlready) {
+    return res.status(400).json({
+      message: "User already liked this post",
+    });
+  }
+  await Like.create({
+    user_id: userId,
+    post_id: postId,
+  });
+
+  await Post.increment(
+    { like_count: 1 },
+    {
+      where: {
+        id: postId,
+      },
+    }
+  );
+  return res.status(201).json({
+    message: "Liked the post successfully",
+  });
+});
+
+router.delete("/:postId/likes/:userId", async (req, res) => {
+  const { userId, postId } = req.params;
+  const isUserLikeAlready = await Like.findOne({
+    where: {
+      user_id: userId,
+      post_id: postId,
+    },
+  });
+  if (!isUserLikeAlready) {
+    return res.status(400).json({
+      message: "User hasn't liked the post",
+    });
+  }
+
+  await Like.destroy({
+    where: {
+      user_id: userId,
+      post_id: postId,
+    },
+  });
+  await Post.increment(
+    { like_count: -1 },
+    {
+      where: {
+        id: postId,
+      },
+    }
+  );
+  return res.status(201).json({
+    message: "Unliked successfully"
+  })
 });
 module.exports = router;

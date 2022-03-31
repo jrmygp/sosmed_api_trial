@@ -18,8 +18,9 @@ app.get("/", (req, res) => {
     res.send("<h1>Welcome to my API </h1>")
 })
 
-const { postRoutes } = require("./routes")
+const { postRoutes, authRoutes } = require("./routes")
 app.use("/posts", postRoutes)
+app.use("/auth", authRoutes)
 
 app.listen(PORT, () => {
     console.log("listening in port", PORT)

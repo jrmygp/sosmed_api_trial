@@ -15,6 +15,10 @@ const Post = (sequelize) => {
             location: {
                 type: DataTypes.STRING,
                 allowNull: true
+            },
+            like_count: {
+                type: DataTypes.INTEGER,
+                defaultValue: 0
             }
         }
     )

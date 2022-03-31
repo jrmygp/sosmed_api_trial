@@ -24,7 +24,7 @@ User.hasMany(Post, { foreignKey: "user_id"})
 User.hasMany(Like, { foreignKey: "user_id"})
 Like.belongsTo(User, { foreignKey: "user_id"})
 Post.hasMany(Like, { foreignKey: "post_id"})
-Like.belongsTo(Post, { foreignKey: "user_id"})
+Like.belongsTo(Post, { foreignKey: "post_id"})
 
 module.exports = {
     sequelize,
