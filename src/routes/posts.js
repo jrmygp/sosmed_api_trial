@@ -1,11 +1,10 @@
 const router = require("express").Router();
-const { Post } = require("../lib/sequelize");
+const { Post, User, Like } = require("../lib/sequelize");
 const { Op } = require("sequelize");
 
 router.get("/", async (req, res) => {
   try {
-
-      // untuk pagination
+    // untuk pagination
     const { _limit = 30, _page = 1 } = req.query;
 
     delete req.query._limit;
@@ -15,10 +14,18 @@ router.get("/", async (req, res) => {
       where: {
         ...req.query,
       },
-      
+
       // untuk pagination
       limit: _limit ? parseInt(_limit) : undefined,
       offset: (_page - 1) * _limit,
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ["password", "createdAt", "updatedAt"],
+          },
+        },
+      ],
     });
 
     return res.status(200).json({
@@ -51,7 +58,6 @@ router.post("/", async (req, res) => {
     });
   }
 });
-
 router.patch("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,5 +103,32 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
+router.get("/:id/likes", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const postLikes = await Like.findAll({
+      where: {
+        post_id: id,
+      },
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ["password", "createdAt", "updatedAt"],
+          },
+        },
+      ],
+    });
 
+    return res.status(200).json({
+      message: "Fetch likes",
+      result: postLikes,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
 module.exports = router;
