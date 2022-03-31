@@ -40,6 +40,7 @@ router.get("/", async (req, res) => {
   }
 });
 router.post("/", async (req, res) => {
+  __
   try {
     const { image_url, caption, location, user_id } = req.body;
     const newPost = await Post.create({
