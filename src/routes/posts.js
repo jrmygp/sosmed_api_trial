@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { Post, User, Like } = require("../lib/sequelize");
 const { Op } = require("sequelize");
+const fileUploader = require("../lib/uploader");
 
 router.get("/", async (req, res) => {
   try {
@@ -39,12 +40,21 @@ router.get("/", async (req, res) => {
     });
   }
 });
-router.post("/", async (req, res) => {
-  __
+router.post("/", fileUploader({
+  destinationFolder: "posts",
+  fileType: "image",
+  prefix: "POST"
+}).single("post_image_file"),
+ async (req, res) => {
   try {
-    const { image_url, caption, location, user_id } = req.body;
+    const { caption, location, user_id } = req.body;
+
+    const uploadFileDomain = process.env.UPLOAD_FILE_DOMAIN
+    const filePath = "post_images"
+    const { filename } = req.file
+    
     const newPost = await Post.create({
-      image_url,
+      image_url: `${uploadFileDomain}/${filePath}/${filename}`,
       caption,
       location,
       user_id,
