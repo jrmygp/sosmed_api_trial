@@ -18,10 +18,11 @@ app.get("/", (req, res) => {
     res.send("<h1>Welcome to my API </h1>")
 })
 
-const { postRoutes, authRoutes } = require("./routes")
+const { postRoutes, authRoutes, userRoutes } = require("./routes")
 app.use("/post_images", express.static(`${__dirname}/public/posts`))
 app.use("/posts", postRoutes)
 app.use("/auth", authRoutes)
+app.use("/user", userRoutes)
 
 app.listen(PORT, () => {
     console.log("listening in port", PORT)

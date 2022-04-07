@@ -2,8 +2,10 @@ const router = require("express").Router();
 const { Post, User, Like } = require("../lib/sequelize");
 const { Op } = require("sequelize");
 const fileUploader = require("../lib/uploader");
+const { authorizedLoggenInUser, authorizeUserWithRole } = require("../middlewares/authMiddleware");
 
-router.get("/", async (req, res) => {
+
+router.get("/", authorizedLoggenInUser, authorizeUserWithRole(["admin"]), async (req, res) => {
   try {
     // untuk pagination
     const { _limit = 30, _page = 1 } = req.query;
@@ -40,7 +42,7 @@ router.get("/", async (req, res) => {
     });
   }
 });
-router.post("/", fileUploader({
+router.post("/", authorizedLoggenInUser, fileUploader({
   destinationFolder: "posts",
   fileType: "image",
   prefix: "POST"
@@ -57,7 +59,7 @@ router.post("/", fileUploader({
       image_url: `${uploadFileDomain}/${filePath}/${filename}`,
       caption,
       location,
-      user_id,
+      user_id: req.token.id,
     });
     res.status(201).json({
       message: "Post created",
@@ -70,7 +72,7 @@ router.post("/", fileUploader({
     });
   }
 });
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authorizedLoggenInUser, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -81,6 +83,7 @@ router.patch("/:id", async (req, res) => {
       {
         where: {
           id,
+          user_id: req.token.id
         },
       }
     );
@@ -95,7 +98,7 @@ router.patch("/:id", async (req, res) => {
     });
   }
 });
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authorizedLoggenInUser, async (req, res) => {
   try {
     const { id } = req.params;
     const deletedPost = await Post.destroy({

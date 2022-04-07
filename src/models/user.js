@@ -23,6 +23,10 @@ const User = (sequelize) => {
       is_verified: {
           type: DataTypes.BOOLEAN,
           defaultValue: false
+      },
+      role: {
+        type: DataTypes.STRING,
+        defaultValue: "user"
       }
     }
   )
