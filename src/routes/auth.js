@@ -1,19 +1,5 @@
-// const authControllers = require("../controllers")
-// const { authorizedLoggenInUser } = require("../middlewares/authMiddleware")
-// const AuthService = require("../services/auth")
-
-// const router = require("express").Router()
-
-// router.post("/login", AuthService.loginUser)
-// router.post("/register", authControllers.registerUser)
-// router.get("/refresh-token", authorizedLoggenInUser, authControllers.keepLogin)
-
-
-// module.exports = router
-
-
 const authControllers = require("../controllers/auth");
-const { authorizedLoggenInUser } = require("../middlewares/authMiddleware");
+const { authorizedLoggenInUser, sessionAuthorizeLoggedInUser } = require("../middlewares/authMiddleware");
 
 const router = require("express").Router();
 
@@ -30,5 +16,13 @@ router.post("/resend-verification", authorizedLoggenInUser, authControllers.rese
 router.post("/v2/register", authControllers.registerUserV2)
 router.get("/v2/verify:token", authControllers.verifyUserV2)
 router.post("/v2/resend-verification", authorizedLoggenInUser,authControllers.resendVerificationEmailV2)
+
+// Sessions
+
+router.post("/session/login", authControllers.sessionLoginUser)
+router.get("/session/refresh-token", sessionAuthorizeLoggedInUser,authControllers.sessionKeepLogin)
+
+router.post("/otp/request", authControllers.sendOTP)
+router.get("otp/login/:otpToken/:userId", authControllers.otpLoginUser)
 
 module.exports = router;

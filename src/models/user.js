@@ -27,6 +27,10 @@ const User = (sequelize) => {
       role: {
         type: DataTypes.STRING,
         defaultValue: "user"
+      },
+      last_login: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     }
   )
